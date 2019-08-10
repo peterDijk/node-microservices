@@ -2,8 +2,18 @@
 const axios = require('axios');
 
 class SpeakersService {
-  constructor(datafile) {
-    this.datafile = datafile;
+  constructor({ serviceRegistryUrl, serviceVersionIdentifier }) {
+    this.serviceRegistryUrl = serviceRegistryUrl;
+    this.serviceVersionIdentifier = serviceVersionIdentifier;
+  }
+
+  async getImage(path) {
+    const { ip, port } = await this.getService('speakers-service');
+    return this.callService({
+      method: 'get',
+      responseType: 'stream',
+      url: `http://${ip}:${port}/images/${path}`,
+    });
   }
 
   async getNames() {
@@ -60,7 +70,7 @@ class SpeakersService {
   }
 
   async getService(servicename) {
-    const response = await axios.get(`http://localhost:3000/find/${servicename}/1`);
+    const response = await axios.get(`${this.serviceRegistryUrl}/find/${servicename}/${this.serviceVersionIdentifier}`);
     return response.data;
   }
 }
